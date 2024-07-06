@@ -2,13 +2,10 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <cctype>    // toupper() e tolower()
+#include <cctype> // toupper() e tolower()
 #include <algorithm> // std::transform
 
 using namespace std;
-
-#define FILENAME "words.txt"
-#define MAX_TRIES 5
 
 vector<string> readFromFile(string filename)
 {
@@ -93,7 +90,7 @@ string getUserGuess(size_t wordSize, int tries)
     return guess;
 }
 
-void runGame(vector<string> &availableWords, int gameCount)
+void runGame(vector<string> &availableWords, int gameCount, int maxTries)
 {
     cout << "Iniciando jogo..." << endl;
     cout << "Jogo " << gameCount << ". Obtendo palavra..." << endl;
@@ -110,18 +107,18 @@ void runGame(vector<string> &availableWords, int gameCount)
     }
 
     cout << "Palavra obtida. Tente adivinhar a palavra de " << word.size() << " letras." << endl;
-    cout << "Voce tem " << MAX_TRIES << " tentativas.\n"
+    cout << "Voce tem " << maxTries << " tentativas.\n"
          << endl;
 
     bool newGame = false;
     int tries = 1;
-    while (tries <= MAX_TRIES)
+    while (tries <= maxTries)
     {
         string guess = getUserGuess(word.size(), tries);
 
         if (guess == word)
         {
-            cout << "VOCE GANHOU! Foram necessarias " << tries << "/" << MAX_TRIES << " tentativas" << endl;
+            cout << "VOCE GANHOU! Foram necessarias " << tries << "/" << maxTries << " tentativas" << endl;
             newGame = true;
             break;
         }
@@ -143,7 +140,7 @@ void runGame(vector<string> &availableWords, int gameCount)
     cout << "\nVoce perdeu! A palavra certa era \"" << word << "\"." << endl;
 }
 
-void printHeader()
+void printHeader(int maxTries)
 {
     cout << "\nBem-vindo ao Wordle/Termo Clone!" << endl;
     cout << "O jogo consiste em adivinhar uma palavras." << endl;
@@ -151,19 +148,29 @@ void printHeader()
     cout << "  - Asteriscos: a palavra a ser adivinhada nao contem a letra;" << endl;
     cout << "  - Letras maiusculas: a palavra a ser adivinhada contem a letra e ela esta na posicao correta;" << endl;
     cout << "  - Letras minusculas: a palavra a ser adivinhada contem a letra mas ela esta na posicao errada." << endl;
-    cout << "O jogador tem " << MAX_TRIES << " tentativas por partida para adivinhar a palavra." << endl;
+    cout << "O jogador tem " << maxTries << " tentativas por partida para adivinhar a palavra." << endl;
     cout << "Boa sorte!\n"
          << endl;
 
     return;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    vector<string> allWords = readFromFile(FILENAME);
+    string filename = "words.txt";
+    int maxTries = 5;
+
+    if (argc == 3)
+    {
+        filename = argv[1];
+        maxTries = atoi(argv[2]);
+    }
+
+
+    vector<string> allWords = readFromFile(filename);
     vector<string> availableWords = allWords;
 
-    printHeader();
+    printHeader(maxTries);
 
     int gameCount = 1;
     int menuOption = -1;
@@ -175,7 +182,7 @@ int main()
         switch (menuOption)
         {
         case 1:
-            runGame(availableWords, gameCount);
+            runGame(availableWords, gameCount, maxTries);
             gameCount++;
             break;
         case 0:
